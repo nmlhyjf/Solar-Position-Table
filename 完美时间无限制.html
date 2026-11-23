@@ -1,0 +1,2193 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>五时礼拜时间</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <style>
+    body {
+        font-family: 'Microsoft YaHei', sans-serif;
+        margin: 0;
+        padding: 2px;
+        background-color: #f5f5f5;
+        font-size: 20px;
+    }
+
+    .container {
+        text-align: center;
+        margin-top: 4px;   /* 原为 5px，略微减小 */
+        margin-bottom: 4px; /* 关键：减小按钮区下方空白 */
+    }
+
+    .container h3 {
+        margin: 0 0 4px 0; /* "表格"标题下边距设为 4px（原可能默认 16px+）*/
+        font-size: 16px;   /* 可选：稍小一点更协调 */
+    }
+
+    .nav-btn {
+        display: inline-block;
+        padding: 6px 18px;     /* 稍微减小内边距 */
+        margin: 0 1px;         /* 按钮之间加一点间隙，避免挤在一起 */
+        font-size: 22px;       /* 可选微调 */
+        cursor: pointer;
+        background-color: #f8f7f4;
+        font-weight: bold;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: auto;           /* 改为 auto，让按钮自适应内容宽度 */
+        min-width: 70px;       /* 最小宽度保证一致性 */
+    }
+     /* 以下是提示按钮  字体字号颜色等控制  */
+   .copy-btn {
+    font-size: 20px;  /* 控制字号大小 */
+    font-weight: bold;  /* 粗体 */
+    color: red;                        /* 文字红色 */
+    background-color: #fff;   /* 背景白色（可选）*/
+    border: 1px solid red;  /* 红色边框，边框线粗细 ，更醒目（可选）*/
+    padding: 5px 10px;  /* 内边距调整，让按钮更舒适 */
+    border-radius: 8px;   /* 圆角（可选）*/
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+    #lowerTitle {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 6px auto 4px auto; /* 上边距 6px，下边距 4px（关键！）*/
+        text-align: center;
+    }
+
+    #timetable {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+        border-collapse: collapse;
+        border: 1px solid #ccc;
+        font-size: 22px;
+    }
+
+    #timetable th,
+    #timetable td {
+        padding: 3px 4px;      /* 减小单元格内边距 */
+        border: 1px solid #ccc;
+        text-align: center;
+    }
+
+    #timetable th {
+        background-color: #f8f7f4;
+        font-weight: bold;
+    }
+
+    #copySuccess {
+        position: static;  /* 改为static，不再固定在页面底部 */
+        margin: 10px auto 5px auto; /* 居中显示并设置上下边距，上方10px下方5px */
+        padding: 10px 20px;
+        background-color: rgba(76, 175, 80, 0.1);
+        border: 1px solid #4CAF50;
+        border-radius: 4px;
+        max-width: 80%;
+        white-space: normal;
+        font-size: 16px;
+        text-align: center; /* 文字居中 */
+    }
+
+    .title {
+        font-size: 24px;
+        margin: 8px 0 4px 0;   /* 标题上下边距：上8px，下4px */
+        text-align: center;
+        color: black;
+    }
+
+    /* 过期提示样式 */
+    #expiredNotice {
+        text-align: center;
+        color: red;
+        font-size: 20px;
+        font-weight: bold;
+        padding: 20px 10px;
+        line-height: 1.5;
+        display: none;
+        background-color: #fff8f8;
+        border: 1px solid #f44336;
+        border-radius: 8px;
+        margin: 8px auto;
+        max-width: 280px;
+    }
+    
+    /* 城市选择样式 */
+    .city-select-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin: 6px 0;
+        font-size: 20px;
+    }
+    
+    .city-label {
+        white-space: nowrap;
+    }
+    
+    #citySelector {
+        padding: 4px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 20px;
+        min-width: 100px;
+    }
+    
+    /* 日期选择器样式 */
+    .date-picker-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin: 6px 0;
+        font-size: 20px;
+    }
+    
+    .date-label {
+        white-space: nowrap;
+    }
+    
+    #datePicker {
+        padding: 4px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 20px;
+    }
+</style>
+    </style>
+</head>
+
+<body>
+
+<!-- 主标题：始终显示 -->
+<h2 class="title">临河城区礼拜时间</h2>
+
+<!-- 过期提示 -->
+<div id="expiredNotice">
+    此礼拜表代码出现错误不能运行
+    如需继续使用 请联系微信号：<br>
+    nmglhyjf（知感人生）<br>
+    索取新的礼拜表代码
+</div>
+
+<!-- 原始内容区 -->
+<div id="originalContent">
+
+    <div class="container">
+        <h3>表格制作：知感人生</h3>
+        
+        <!-- 城市选择框：放在第三行位置 -->
+        <div class="city-select-container">
+            <span class="city-label">城市选择→</span>
+            <select id="citySelector" onchange="onCityChange()">
+                <option value="linhe">临河城区</option>
+<option value="hanghou">杭锦后旗</option>
+<option value="dengkou">磴口城区</option>
+<option value="wuyuan">五原城区</option>
+<option value="wudaxs">乌达西寺</option>
+<option value="pingluo" >平罗县</option>
+<option value="ycxq">银川兴庆区</option>
+<option value="hongquan">海原李旺红圈村</option>
+<option value="txqzds">同心大寺</option>
+<option value="guyuan">固原</option>
+<option value="ynsd" >云南沙甸</option>	
+<option value="hnsy" >海南三亚</option>
+
+ <!--  <option value="szs">石嘴山大寺</option>
+<option value="lanzouqlh" >兰州七里河</option>
+<option value="linxiazf">临夏州政府</option>
+<option value="dinxizf">定西政府</option>
+<option value="tianshiu" >天水政府</option>
+<option value="xiangquan" >香泉镇</option>
+<option value="lixian" >礼县政府</option>
+<option value="xijizf">西吉政府</option>
+<option value="huinin" >会宁政府</option>
+<option value="pinliang" >平凉政府</option>
+<option value="zangjiac">张家川</option>
+              <option value="beijing">北京</option>
+                <option value="shanghai">上海</option>
+                <option value="urumqi">乌鲁木齐</option>
+                <option value="guangzhou">广州</option>
+                <option value="hangzhou">杭州</option> -->
+                <option value="makkah">麦加</option>
+<option value="mak8kah">麦8加</option>
+            </select>
+        </div>
+        
+        <button class="nav-btn" onclick="changeDate(-1)">前一天</button>
+        <button class="nav-btn" onclick="changeDate(0)">今天</button>
+        <button class="nav-btn" onclick="changeDate(1)">后一天</button>
+        
+        <!-- 日期选择框 -->
+        <div class="date-picker-container">
+            <span class="date-label">选择日期→</span>
+            <input type="date" id="datePicker" onchange="onDateChange()">
+        </div>
+    </div>
+
+    <p align="center" id="lowerTitle">临河城区礼拜表</p>
+   <!-- 表格生成部分 -->
+ <div align="center" id="tableContainer"></div>
+   
+   <!-- 复制成功提示移到按钮上方 -->
+   <div align="center" style="margin-top: 10px;">
+        <div id="copySuccess" style="display: none; font-size: 20px; font-weight: bold;">复制成功！</div>
+        <button class="copy-btn" onclick="copyContent()">→点击此处复制礼拜时间</button>
+    </div>
+
+</div>
+
+<script>
+    const EXPIRY_DATE = new Date('2028-03-22');
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const expiry = new Date(EXPIRY_DATE);
+    expiry.setHours(0, 0, 0, 0);
+
+    if (now > expiry) {
+        document.getElementById('originalContent').style.display = 'none';
+        document.getElementById('expiredNotice').style.display = 'block';
+    }
+    
+    // 页面加载时恢复之前选择的城市
+    window.onload = function() {
+        const savedCity = localStorage.getItem('selectedCity');
+        if (savedCity && cityConfig[savedCity]) {
+            document.getElementById('citySelector').value = savedCity;
+            currentCity = savedCity;
+            updateTitleAndLower();
+            calculatePrayerTimes();
+        }
+    };
+</script>
+
+<!-- PrayTimes.js + 自定义逻辑 -->
+<script type="text/javascript">
+  
+  //--------------------- Copyright Block ----------------------
+        /* 
+
+        PrayTimes.js: Prayer Times Calculator (ver 2.3)
+        Copyright (C) 2007-2011 PrayTimes.org
+
+        Developer: Hamid Zarrabi-Zadeh
+        License: GNU LGPL v3.0
+
+        TERMS OF USE:
+            Permission is granted to use this code, with or 
+            without modification, in any website or application 
+            provided that credit is given to the original work 
+            with a link back to PrayTimes.org.
+
+        This program is distributed in the hope that it will 
+        be useful, but WITHOUT ANY WARRANTY. 
+
+        PLEASE DO NOT REMOVE THIS COPYRIGHT BLOCK.
+         
+        */ 
+
+        //--------------------- Help and Manual ----------------------
+        /*
+
+        User's Manual: 
+        http://praytimes.org/manual
+
+        Calculation Formulas: 
+        http://praytimes.org/calculation
+
+        //------------------------ User Interface -------------------------
+
+
+        getTimes (date, coordinates [, timeZone [, dst [, timeFormat]]]) 
+        
+        setMethod (method)       // set calculation method 
+        adjust (parameters)      // adjust calculation parameters	
+        tune (offsets)           // tune times by given offsets 
+
+        getMethod ()             // get calculation method 
+        getSetting ()            // get current calculation parameters
+        getOffsets ()            // get current time offsets
+
+
+        //------------------------- Sample Usage --------------------------
+
+
+        var PT = new PrayTimes('ISNA');
+        var times = PT.getTimes(new Date(), [43, -80], -5);
+        document.write('Sunrise = '+ times.Sunrise')
+
+
+        */
+        
+
+        //----------------------- PrayTimes Class ------------------------
+
+
+        function PrayTimes(method) {
+
+
+            //------------------------ Constants --------------------------
+            var
+
+            // Time Names
+            timeNames = {
+                imsak    : 'Imsak',
+                fajr     : 'Fajr',
+                sunrise  : 'Sunrise',
+                dhuhr    : 'Dhuhr',
+                asr      : 'Asr',
+                sunset   : 'Sunset',
+                maghrib  : 'Maghrib',
+                isha     : 'Isha',
+                midnight : 'Midnight'
+            },
+
+
+            // Calculation Methods
+            methods = {
+                MWL: {
+                    name: 'Muslim World League',
+                    params: { fajr: 18, isha: 17 } },
+                ISNA: {
+                    name: 'Islamic Society of North America (ISNA)',
+                    params: { fajr: 15, isha: 15 } },
+                Egypt: {
+                    name: 'Egyptian General Authority of Survey',
+                    params: { fajr: 19.5, isha: 17.5 } },
+                Makkah: {
+                    name: 'Umm Al-Qura University, Makkah',
+                    params: { fajr: 18.5, isha: '90 min' } },  // fajr was 19 degrees before 1430 hijri
+                Karachi: {
+                    name: 'University of Islamic Sciences, Karachi',
+                    params: { fajr: 18, isha: 18 } },
+                Tehran: {
+                    name: 'Institute of Geophysics, University of Tehran',
+                    params: { fajr: 17.7, isha: 14, maghrib: 4.5, midnight: 'Jafari' } },  // isha is not explicitly specified in this method
+                Jafari: {
+                    name: 'Shia Ithna-Ashari, Leva Institute, Qum',
+                    params: { fajr: 16, isha: 14, maghrib: 4, midnight: 'Jafari' } }
+            },
+
+
+            // Default Parameters in Calculation Methods
+            defaultParams = {
+                maghrib: '0 min', midnight: 'Standard'
+
+            },
+ 
+ 
+            //----------------------- 参数值 ----------------------
+            /*
+            
+            // Asr Juristic Methods
+            asrJuristics = [ 
+                'Standard',    // Shafi`i, Maliki, Ja`fari, Hanbali
+                'Hanafi'       // Hanafi
+            ],
+
+
+            // Midnight Mode
+            midnightMethods = [ 
+                'Standard',    // Mid Sunset to Sunrise
+                'Jafari'       // Mid Sunset to Fajr
+            ],
+
+
+            // Adjust Methods for Higher Latitudes
+            highLatMethods = [
+                'NightMiddle', // middle of night
+                'AngleBased',  // angle/60th of night
+                'OneSeventh',  // 1/7th of night
+                'None'         // No adjustment
+            ],
+
+
+            // Time Formats
+            timeFormats = [
+                '24h',         // 24-hour format
+                '12h',         // 12-hour format
+                '12hNS',       // 12-hour format with no suffix
+                'Float'        // floating point number 
+            ],
+            */	
+
+
+            //---------------------- Default Settings --------------------
+            
+            calcMethod = 'MWL',
+
+            // do not change anything here; use adjust method instead
+            setting = {  
+                imsak    : '0 min',
+                dhuhr    : '0 min',  
+                asr      : 'Hanafi',
+                highLats : 'NightMiddle'
+            },
+
+            timeFormat = '24h',
+            timeSuffixes = ['am', 'pm'],
+            invalidTime =  '-----',
+
+            numIterations = 1,
+            offset = {},
+
+
+            //----------------------- Local Variables ---------------------
+
+            lat, lng, elv,       // coordinates
+            timeZone, jDate;     // time variables
+            
+
+            //---------------------- Initialization -----------------------
+            
+            
+            // set methods defaults
+            var defParams = defaultParams;
+            for (var i in methods) {
+                var params = methods[i].params;
+                for (var j in defParams)
+                    if ((typeof(params[j]) == 'undefined'))
+                        params[j] = defParams[j];
+            };
+
+            // initialize settings
+            calcMethod = methods[method] ? method : calcMethod;
+            var params = methods[calcMethod].params;
+            for (var id in params)
+                setting[id] = params[id];
+
+            // init time offsets
+            for (var i in timeNames)
+                offset[i] = 0;
+
+                
+            
+            //----------------------- Public Functions ------------------------
+            return {
+
+            
+            // set calculation method 
+            setMethod: function(method) {
+                if (methods[method]) {
+                    this.adjust(methods[method].params);
+                    calcMethod = method;
+                }
+            },
+
+
+            // set calculating parameters
+            adjust: function(params) {
+                for (var id in params)
+                    setting[id] = params[id];
+            },
+
+
+            // set time offsets
+            tune: function(timeOffsets) {
+                for (var i in timeOffsets)
+                    offset[i] = timeOffsets[i];
+            },
+
+
+            // get current calculation method
+            getMethod: function() { return calcMethod; },
+
+            // get current setting
+            getSetting: function() { return setting; },
+
+            // get current time offsets
+            getOffsets: function() { return offset; },
+
+            // get default calc parametrs
+            getDefaults: function() { return methods; },
+
+
+            // return prayer times for a given date
+            getTimes: function(date, coords, timezone, dst, format) {
+                lat = 1* coords[0];
+                lng = 1* coords[1]; 
+                elv = coords[2] ? 1* coords[2] : 0;
+                timeFormat = format || timeFormat;
+                if (date.constructor === Date)
+                    date = [date.getFullYear(), date.getMonth()+ 1, date.getDate()];
+                if (typeof(timezone) == 'undefined' || timezone == 'auto')
+                    timezone = this.getTimeZone(date);
+                if (typeof(dst) == 'undefined' || dst == 'auto') 
+                    dst = this.getDst(date);
+                timeZone = 1* timezone+ (1* dst ? 1 : 0);
+                jDate = this.julian(date[0], date[1], date[2])- lng/ (15* 24);
+                
+                return this.computeTimes();
+            },
+
+
+            // convert float time to the given format (see timeFormats)
+            getFormattedTime: function(time, format, suffixes) {
+                if (isNaN(time))
+                    return invalidTime;
+                if (format == 'Float') return time;
+                suffixes = suffixes || timeSuffixes;
+
+                time = DMath.fixHour(time+ 0.5/ 60);  // add 0.5 minutes to round
+                var hours = Math.floor(time); 
+                var minutes = Math.floor((time- hours)* 60);
+                var suffix = (format == '12h') ? suffixes[hours < 12 ? 0 : 1] : '';
+                var hour = (format == '24h') ? this.twoDigitsFormat(hours) : ((hours+ 12 -1)% 12+ 1);
+                return hour+ ':'+ this.twoDigitsFormat(minutes)+ (suffix ? ' '+ suffix : '');
+            },
+
+
+            //---------------------- Calculation Functions -----------------------
+
+
+            // compute mid-day time
+            midDay: function(time) {
+                var eqt = this.sunPosition(jDate+ time).equation;
+                var noon = DMath.fixHour(12- eqt);
+                return noon;
+            },
+
+
+            // compute the time at which sun reaches a specific angle below horizon
+            sunAngleTime: function(angle, time, direction) {
+                var decl = this.sunPosition(jDate+ time).declination;
+                var noon = this.midDay(time);
+                var t = 1/15* DMath.arccos((-DMath.sin(angle)- DMath.sin(decl)* DMath.sin(lat))/ 
+                        (DMath.cos(decl)* DMath.cos(lat)));
+                return noon+ (direction == 'ccw' ? -t : t);
+            },
+
+
+            // compute asr time 
+            asrTime: function(factor, time) { 
+                var decl = this.sunPosition(jDate+ time).declination;
+                var angle = -DMath.arccot(factor+ DMath.tan(Math.abs(lat- decl)));
+                return this.sunAngleTime(angle, time);
+            },
+
+
+            // compute declination angle of sun and equation of time
+            // Ref: http://aa.usno.navy.mil/faq/docs/SunApprox.php
+            sunPosition: function(jd) {
+                var D = jd - 2451545.0;
+                var g = DMath.fixAngle(357.529 + 0.98560028* D);
+                var q = DMath.fixAngle(280.459 + 0.98564736* D);
+                var L = DMath.fixAngle(q + 1.915* DMath.sin(g) + 0.020* DMath.sin(2*g));
+
+                var R = 1.00014 - 0.01671* DMath.cos(g) - 0.00014* DMath.cos(2*g);
+                var e = 23.439 - 0.00000036* D;
+
+                var RA = DMath.arctan2(DMath.cos(e)* DMath.sin(L), DMath.cos(L))/ 15;
+                var eqt = q/15 - DMath.fixHour(RA);
+                var decl = DMath.arcsin(DMath.sin(e)* DMath.sin(L));
+
+                return {declination: decl, equation: eqt};
+            },
+
+
+            // convert Gregorian date to Julian day
+            // Ref: Astronomical Algorithms by Jean Meeus
+            julian: function(year, month, day) {
+                if (month <= 2) {
+                    year -= 1;
+                    month += 12;
+                };
+                var A = Math.floor(year/ 100);
+                var B = 2- A+ Math.floor(A/ 4);
+
+                var JD = Math.floor(365.25* (year+ 4716))+ Math.floor(30.6001* (month+ 1))+ day+ B- 1524.5;
+                return JD;
+            },
+
+            
+            //---------------------- 计算礼拜时间 -----------------------
+
+
+            // compute prayer times at given julian date
+            computePrayerTimes: function(times) {
+                times = this.dayPortion(times);
+                var params  = setting;
+                
+                var imsak   = this.sunAngleTime(this.eval(params.imsak), times.imsak, 'ccw');
+                var fajr    = this.sunAngleTime(this.eval(params.fajr), times.fajr, 'ccw');
+                var sunrise = this.sunAngleTime(this.riseSetAngle(), times.sunrise, 'ccw');  
+                var dhuhr   = this.midDay(times.dhuhr);
+                var asr     = this.asrTime(this.asrFactor(params.asr), times.asr);
+                var sunset  = this.sunAngleTime(this.riseSetAngle(), times.sunset);;  
+                var maghrib = this.sunAngleTime(this.eval(params.maghrib), times.maghrib);
+                var isha    = this.sunAngleTime(this.eval(params.isha), times.isha);
+
+                return {
+                    imsak: imsak, fajr: fajr, sunrise: sunrise, dhuhr: dhuhr, 
+                    asr: asr, sunset: sunset, maghrib: maghrib, isha: isha
+                };
+            },
+
+
+            // compute prayer times 
+            computeTimes: function() {
+                // default times
+                var times = { 
+                    imsak: 5, fajr: 5, sunrise: 6, dhuhr: 12, 
+                    asr: 13, sunset: 18, maghrib: 18, isha: 18
+                };
+
+                // main iterations
+                for (var i=1 ; i<=numIterations ; i++) 
+                    times = this.computePrayerTimes(times);
+
+                times = this.adjustTimes(times);
+                
+                // add midnight time
+                times.midnight = (setting.midnight == 'Jafari') ? 
+                        times.sunset+ this.timeDiff(times.sunset, times.fajr)/ 2 :
+                        times.sunset+ this.timeDiff(times.sunset, times.sunrise)/ 2;
+
+                times = this.tuneTimes(times);
+                return this.modifyFormats(times);
+            },
+
+
+            // adjust times 
+            adjustTimes: function(times) {
+                var params = setting;
+                for (var i in times)
+                    times[i] += timeZone- lng/ 15;
+                    
+                if (params.highLats != 'None')
+                    times = this.adjustHighLats(times);
+                    
+                if (this.isMin(params.imsak))
+                    times.imsak = times.fajr- this.eval(params.imsak)/ 60;
+                if (this.isMin(params.maghrib))
+                    times.maghrib = times.sunset+ this.eval(params.maghrib)/ 60;
+                if (this.isMin(params.isha))
+                    times.isha = times.maghrib+ this.eval(params.isha)/ 60;
+                times.dhuhr += this.eval(params.dhuhr)/ 60; 
+
+                return times;
+            },
+
+
+            // get asr shadow factor
+            asrFactor: function(asrParam) {
+                var factor = {Standard: 1, Hanafi: 2}[asrParam];
+                return factor || this.eval(asrParam);
+            },
+
+
+            // return sun angle for sunset/sunrise
+            riseSetAngle: function() {
+                //var earthRad = 6371009; // in meters
+                //var angle = DMath.arccos(earthRad/(earthRad+ elv));
+                var angle = 0.0347* Math.sqrt(elv); // an approximation
+                return 0.833+ angle;
+            },
+
+
+            // apply offsets to the times
+            tuneTimes: function(times) {
+                for (var i in times)
+                    times[i] += offset[i]/ 60; 
+                return times;
+            },
+
+
+            // convert times to given time format
+            modifyFormats: function(times) {
+                for (var i in times)
+                    times[i] = this.getFormattedTime(times[i], timeFormat); 
+                return times;
+            },
+
+
+            // adjust times for locations in higher latitudes
+            adjustHighLats: function(times) {
+                var params = setting;
+                var nightTime = this.timeDiff(times.sunset, times.sunrise); 
+
+                times.imsak = this.adjustHLTime(times.imsak, times.sunrise, this.eval(params.imsak), nightTime, 'ccw');
+                times.fajr  = this.adjustHLTime(times.fajr, times.sunrise, this.eval(params.fajr), nightTime, 'ccw');
+                times.isha  = this.adjustHLTime(times.isha, times.sunset, this.eval(params.isha), nightTime);
+                times.maghrib = this.adjustHLTime(times.maghrib, times.sunset, this.eval(params.maghrib), nightTime);
+                
+                return times;
+            },
+
+            
+            // adjust a time for higher latitudes
+            adjustHLTime: function(time, base, angle, night, direction) {
+                var portion = this.nightPortion(angle, night);
+                var timeDiff = (direction == 'ccw') ? 
+                    this.timeDiff(time, base):
+                    this.timeDiff(base, time);
+                if (isNaN(time) || timeDiff > portion) 
+                    time = base+ (direction == 'ccw' ? -portion : portion);
+                return time;
+            },
+
+            
+            // the night portion used for adjusting times in higher latitudes
+            nightPortion: function(angle, night) {
+                var method = setting.highLats;
+                var portion = 1/2 // MidNight
+                if (method == 'AngleBased')
+                    portion = 1/60* angle;
+                if (method == 'OneSeventh')
+                    portion = 1/7;
+                return portion* night;
+            },
+
+
+            // convert hours to day portions 
+            dayPortion: function(times) {
+                for (var i in times)
+                    times[i] /= 24;
+                return times;
+            },
+
+
+            //---------------------- 时区函数 -----------------------
+
+
+            // get local time zone
+            getTimeZone: function(date) {
+                var year = date[0];
+                var t1 = this.gmtOffset([year, 0, 1]);
+                var t2 = this.gmtOffset([year, 6, 1]);
+                return Math.min(t1, t2);
+            },
+
+            
+            // get daylight saving for a given date
+            getDst: function(date) {
+                return 1* (this.gmtOffset(date) != this.getTimeZone(date));
+            },
+
+
+            // GMT offset for a given date
+            gmtOffset: function(date) {
+                var localDate = new Date(date[0], date[1]- 1, date[2], 12, 0, 0, 0);
+                var GMTString = localDate.toGMTString();
+                var GMTDate = new Date(GMTString.substring(0, GMTString.lastIndexOf(' ')- 1));
+                var hoursDiff = (localDate- GMTDate) / (1000* 60* 60);
+                return hoursDiff;
+            },
+
+            
+            //---------------------- 杂项功能 -----------------------
+
+            // convert given string into a number
+            eval: function(str) {
+                return 1* (str+ '').split(/[^0-9.+-]/)[0];
+            },
+
+
+            // detect if input contains 'min'
+            isMin: function(arg) {
+                return (arg+ '').indexOf('min') != -1;
+            },
+
+
+            // compute the difference between two times 
+            timeDiff: function(time1, time2) {
+                return DMath.fixHour(time2- time1);
+            },
+
+
+            // add a leading 0 if necessary
+            twoDigitsFormat: function(num) {
+                return (num <10) ? '0'+ num : num;
+            }
+            
+        }}
+
+        //---------------------- Degree-Based Math Class -----------------------
+
+
+        var DMath = {
+
+            dtr: function(d) { return (d * Math.PI) / 180.0; },
+            rtd: function(r) { return (r * 180.0) / Math.PI; },
+
+            sin: function(d) { return Math.sin(this.dtr(d)); },
+            cos: function(d) { return Math.cos(this.dtr(d)); },
+            tan: function(d) { return Math.tan(this.dtr(d)); },
+
+            arcsin: function(d) { return this.rtd(Math.asin(d)); },
+            arccos: function(d) { return this.rtd(Math.acos(d)); },
+            arctan: function(d) { return this.rtd(Math.atan(d)); },
+
+            arccot: function(x) { return this.rtd(Math.atan(1/x)); },
+            arctan2: function(y, x) { return this.rtd(Math.atan2(y, x)); },
+
+            fixAngle: function(a) { return this.fix(a, 360); },
+            fixHour:  function(a) { return this.fix(a, 24 ); },
+
+            fix: function(a, b) { 
+                a = a- b* (Math.floor(a/ b));
+                return (a < 0) ? a+ b : a;
+            }
+        }
+
+
+        //---------------------- Init Object -----------------------
+
+
+        var prayTimes = new PrayTimes();
+
+    // =================== 自定义功能 ===================
+    let currentDate = new Date(); // 当前日期变量
+    let currentCity = 'linhe'; // 当前选择的城市，默认为临河
+
+    // 城市配置对象：包含每个城市的名称、坐标和自定义设置
+    // 结构说明：
+    // cityName: {
+    //   name: '中文城市名',           // 显示用的城市名称
+    //   coords: [纬度, 经度],        // 城市地理坐标
+    //   timezone: 8,                 // 时区，如中国大部分地区为8，麦加为3
+    //   method: 'MWL',               // 计算方法：'MWL'表示穆斯林世界联盟, 'ISNA'表示北美伊斯兰协会, 'Egypt'表示埃及, 'Makkah'表示麦加, 'Karachi'表示卡拉奇, 'Tehran'表示德黑兰, 'Jafari'表示什叶派
+    //   asr_method: 'Standard',      // 晡礼计算方法：'Standard'表示标准(沙斐仪), 'Hanafi'表示哈乃斐
+    //   custom: {                    // 自定义时间设置
+    //     fajr_type: 'offset',       // 晨礼计算类型: 'offset'表示基于PrayTimes结果加减分钟, 'sunrise'表示基于日出时间加减分钟
+    //     fajr_value: -50,           // 晨礼时间值：如果是offset类型，则为PrayTimes结果的偏移分钟数；如果是sunrise类型，则为日出时间的偏移分钟数
+    //     dhuhr_type: 'offset',      // 晌礼计算类型: 'offset'表示基于PrayTimes结果加减分钟, 'fixed'表示固定时间, 'conditional'表示条件性显示, 'multiThreshold'表示多阈值条件显示
+    //     dhuhr_value: 30,           // 晌礼时间值：如果是offset类型，则为PrayTimes结果的偏移分钟数；如果是fixed类型，则为"HH:mm"格式的固定时间；如果是conditional类型，则为偏移分钟数
+    //     dhuhr_condition_threshold: '12:54', // 晌礼条件阈值：当计算结果小于等于此时间时，显示固定时间，否则按计算结果显示
+    //     dhuhr_condition_fixed: '1:00', // 晌礼条件固定时间：当计算结果小于等于阈值时显示的固定时间
+    //     dhuhr_multi_thresholds: [  // 晌礼多阈值配置：数组包含多个阈值对象
+    //       { threshold: '12:30', fixed: '1:00' },  // 当计算结果小于等于'12:30'时显示'1:00'
+    //       { threshold: '12:50', fixed: '1:15' },  // 当计算结果大于'12:30'但小于等于'12:50'时显示'1:15'
+    //       { threshold: '13:10', fixed: '1:30' }   // 当计算结果大于'12:50'但小于等于'13:10'时显示'1:30'
+    //     ],
+    //     isha_type: 'sunrise',      // 宵礼计算类型: 'offset'表示基于PrayTimes结果加减分钟, 'sunset'表示基于日落时间加减分钟
+    //     isha_value: 63,            // 宵礼时间值：如果是offset类型，则为PrayTimes结果的偏移分钟数；如果是sunset类型，则为日落时间的偏移分钟数
+    //     imsak_type: 'fajr' or 'sunrise',  // 止斋计算类型: 'fajr'表示基于晨礼时间加减分钟, 'sunrise'表示基于日出时间加减分钟
+    //     imsak_offset: -5,          // 止斋时间偏移（分钟）：从晨礼时间加此偏移
+    //     sunrise_imsak_offset: -60, // 基于日出的止斋时间偏移（分钟）：从日出时间加此偏移
+    //     asr_offset: 0,             // 晡礼时间偏移（分钟）：从基础晡礼时间加此偏移
+    //     maghrib_offset: 8,         // 昏礼时间偏移（分钟）：从日落时间加此偏移
+    //     main_hemp_time: '12点50分' // 主麻时间固定显示
+    //   },
+  //   copy_options: {              // 复制选项：定义该城市要复制哪些项目
+    //     include_imsak: true,       // 包含止斋时间   不包含false    包含true
+    //     include_fajr: true,        // 包含晨礼时间
+    //     include_sunrise: true,     // 包含日出时间
+    //     include_dhuhr: true,       // 包含晌礼时间
+    //     include_asr: true,         // 包含晡礼时间
+    //     include_sunset: true,      // 包含日落时间
+    //     include_maghrib: true,     // 包含昏礼时间
+    //     include_isha: true,        // 包含宵礼时间
+    //     include_main_hemp: true,   // 包含主麻时间
+    //     include_lftar: true,       // 包含开斋时间
+    //     include_localdhuhr: true,  // 包含撇史尼时间
+    //     include_localIsha: true    // 包含胡夫滩时间
+    //   }
+    // }
+    const cityConfig = {
+        linhe: {
+            name: '临河城区',
+            coords: [40.741428, 107.385986],
+            timezone: 8, // 中国时区 UTC+8
+            method: 'ISNA', // 北方城市使用ISNA方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+
+            custom: {
+                fajr_offset: 0, // 晨礼基于PrayTimes结果
+                localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 0, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:55', fixed: '1:05' },  // 当计算结果小于等于'12:55'时显示'1:05'
+                    { threshold: '13:05', fixed: '1:10' },   // 当计算结果大于'12:57'但小于等于'13:02'时显示'1:10'
+                    { threshold: '13:10', fixed: '1:15' }    // 当计算结果大于'13:05'但小于等于'13:10'时显示'1:15'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 63, // 日落后63分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5, // 止斋从晨礼减去5分钟
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 0, // 晡礼时间不偏移
+                lftar_offset: 5, // 【新增】开斋时间：日落时间+5分钟
+                maghrib_offset: 8, // 昏礼从日落加上8分钟
+                main_hemp_time: '12点50分' // 主麻时间
+            },
+            copy_options: {
+                include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_localfajr: true,        // 是否包含本地晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: false,       // 是否包含日中时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: false,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            },
+            copy_tips: [                   // 新增：复制提示配置
+                { text: "温馨提示", centered: true, position: 'above' },
+                { text: "🕌礼拜对于全体", centered: false, position: 'above' },
+ { text: "穆民是定时的主命！", centered: false, position: 'above' }
+            ]
+        },
+           hanghou: {
+            name: '陕坝大寺',
+            coords: [40.8932, 107.1399],
+          timezone: 8, // 中国时区 UTC+8
+            method: 'ISNA', // 北方城市使用ISNA方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+              fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+               dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 0, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:55', fixed: '1:05' },  // 当计算结果小于等于'12:55'时显示'1:05'
+                    { threshold: '13:02', fixed: '1:10' },   // 当计算结果大于'12:57'但小于等于'13:02'时显示'1:10'
+                    { threshold: '13:10', fixed: '1:15' }    // 当计算结果大于'13:03'但小于等于'13:10'时显示'1:15'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 63, // 日落后63分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5, // 止斋从晨礼减去5分钟
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 0, // 晡礼时间不偏移
+               lftar_offset: 5, // 【新增】开斋时间：日落时间+5分钟
+                maghrib_offset: 8, // 昏礼从日落加上8分钟
+                main_hemp_time: '12点50分' // 主麻时间
+            },
+            copy_options: {
+               include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_localfajr: true,        // 是否包含本地晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: false,       // 是否包含日中时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: false,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            },
+            copy_tips: [                   // 新增：复制提示配置
+                { text: "温馨提示", centered: true, position: 'above' },
+                { text: "🕌礼拜对于全体", centered: false, position: 'above' },
+ { text: "穆民是定时的主命！", centered: false, position: 'above' }
+            ]
+        },
+        dengkou: {
+            name: '磴口城区',
+            coords: [40.3315, 107.01724], 
+         timezone: 8, // 中国时区 UTC+8
+            method: 'ISNA', // 北方城市使用ISNA方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 0, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:55', fixed: '1:05' },  // 当计算结果小于等于'12:55'时显示'1:05'
+                    { threshold: '13:02', fixed: '1:10' },   // 当计算结果大于'12:57'但小于等于'13:02'时显示'1:10'
+                    { threshold: '13:10', fixed: '1:15' }    // 当计算结果大于'13:03'但小于等于'13:10'时显示'1:15'
+                ],
+                isha_type: 'sunset', // 宵礼基于PrayTimes结果加减分钟
+                isha_value: 70, // 日落后70分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5, // 止斋从晨礼减去5分钟
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 0, // 晡礼时间不偏移
+                lftar_offset: 8, // 【新增】开斋时间：日落时间+8分钟
+                maghrib_offset: 15, // 昏礼从日落加上8分钟
+                main_hemp_time: '参考晌礼时间' // 主麻时间
+            },
+            copy_options: {
+               include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_localfajr: true,        // 是否包含本地晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: false,       // 是否包含日中时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: false,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+                  },
+wuyuan: {
+            name: '五原南寺',
+            coords: [41.08945, 108.2842], 
+         timezone: 8, // 中国时区 UTC+8
+            method: 'ISNA', // 北方城市使用ISNA方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                 fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                 dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 0, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:55', fixed: '1:05' },  // 当计算结果小于等于'12:55'时显示'1:05'
+                    { threshold: '13:02', fixed: '1:10' },   // 当计算结果大于'12:57'但小于等于'13:02'时显示'1:10'
+                    { threshold: '13:10', fixed: '1:15' }    // 当计算结果大于'13:03'但小于等于'13:10'时显示'1:15'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 63, // 日落后63分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5, // 止斋从晨礼减去5分钟
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 0, // 晡礼时间不偏移
+                 lftar_offset: 5, // 【新增】开斋时间：日落时间+5分钟
+                maghrib_offset: 8, // 昏礼从日落加上8分钟
+                main_hemp_time: '12点50分' // 主麻时间
+            },
+            copy_options: {
+                include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_localfajr: true,        // 是否包含本地晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: false,       // 是否包含日中时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: false,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+                 },
+         wudaxs: {
+            name: '乌达西寺',
+            coords: [39.5156, 106.6975],
+         timezone: 8, // 中国时区 UTC+8
+            method: 'ISNA', // 北方城市使用ISNA方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                 fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                 dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 0, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:55', fixed: '1:05' },  // 当计算结果小于等于'12:55'时显示'1:05'
+                    { threshold: '13:02', fixed: '1:10' },   // 当计算结果大于'12:57'但小于等于'13:02'时显示'1:10'
+                    { threshold: '13:10', fixed: '1:15' }    // 当计算结果大于'13:03' but小于等于'13:10'时显示'1:15'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 60, // 日落后60分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5, // 止斋从晨礼减去5分钟
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 10, // 晡礼时间加10分钟
+                lftar_offset: 5, // 【新增】开斋时间：日落时间+5分钟
+                maghrib_offset: 10, // 昏礼从日落加上10分钟
+                main_hemp_time: '12点55分' // 主麻时间
+            },
+            copy_options: {
+               include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_localfajr: true,        // 是否包含本地晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: false,       // 是否包含日中时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: false,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+        }, 
+  pingluo: {
+            name: '平罗县',
+            coords: [38.913569, 106.52343],
+          timezone: 8, // 中国时区 UTC+8
+            method: 'ISNA', // 北方城市使用ISNA方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                 dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 0, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:55', fixed: '1:05' },  // 当计算结果小于等于'12:55'时显示'1:05'
+                    { threshold: '13:02', fixed: '1:10' },   // 当计算结果大于'12:57' but小于等于'13:02'时显示'1:10'
+                    { threshold: '13:10', fixed: '1:15' }    // 当计算结果大于'13:03' but小于等于'13:10'时显示'1:15'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 69, // 日落后69分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5, // 止斋从晨礼减去5分钟
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 0, // 晡礼时间不偏移
+                lftar_offset: 4, // 【新增】开斋时间：日落时间+5分钟
+                maghrib_offset: 8, // 昏礼从日落加上8分钟
+                main_hemp_time: '参照晌礼' // 主麻时间
+            },
+            copy_options: {
+               include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_localfajr: true,        // 是否包含本地晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: false,       // 是否包含日中时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: false,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+        },
+          ycxq: {
+            name: '银川兴庆区',
+            coords: [38.49858339, 106.312657],
+          timezone: 8, // 中国时区 UTC+8
+            method: 'ISNA', // 北方城市使用ISNA方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+               fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                fajr_type: 'sunrise', // 晨礼基于日出时间
+                fajr_value: -60, // 日出前50分钟
+                dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 0, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:55', fixed: '1:05' },  // 当计算结果小于等于'12:55'时显示'1:05'
+                    { threshold: '13:02', fixed: '1:10' },   // 当计算结果大于'12:57' but小于等于'13:02'时显示'1:10'
+                    { threshold: '13:10', fixed: '1:15' }    // 当计算结果大于'13:03' but小于等于'13:10'时显示'1:15'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 63, // 日落后63分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5, // 止斋从晨礼减去5分钟
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 0, // 晡礼时间不偏移
+                lftar_offset: 5, // 【新增】开斋时间：日落时间+5分钟
+                maghrib_offset: 8, // 昏礼从日落加上8分钟
+                main_hemp_time: '12点50分' // 主麻时间
+            },
+            copy_options: {
+               include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_localfajr: true,        // 是否包含本地晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: false,       // 是否包含日中时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: false,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+        },
+ hongquan: {
+            name: '红圏清真大寺',
+            coords: [36.63004,  106.13243],
+          timezone: 8, // 中国时区 UTC+8
+            method: 'ISNA', // 北方城市使用ISNA方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                 dhuhr_type: 'fixed', // 晌礼为固定时间
+                dhuhr_value: '1点25分', // 固定显示时间
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:30', fixed: '12:50' },  // 当计算结果小于等于'12:30'时显示'12:50'
+                    { threshold: '12:50', fixed: '1:00' },   // 当计算结果大于'12:30' but小于等于'12:50'时显示'1:00'
+                    { threshold: '13:10', fixed: '1:10' }    // 当计算结果大于'12:50' but小于等于'13:10'时显示'1:10'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 60, // 日落后58分钟
+                imsak_type: 'sunrise', // 止斋基于晨礼时间
+                imsak_offset: -31, // 止斋从晨礼减去29分钟
+                sunrise_imsak_offset: -100, // 基于日出的止斋时间从日出减去100分钟
+                asr_offset: -10, // 晡礼时间不偏移
+                lftar_offset: 8, // 【新增】开斋时间：日落时间+8分钟
+                maghrib_offset: 10, // 昏礼从日落加上8分钟
+                main_hemp_time: '1点00分' // 主麻时间
+            },
+            copy_options: {
+               include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_localfajr: true,        // 是否包含本地晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: false,       // 是否包含日中时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: false,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            },
+            copy_tips: [                   // 新增：复制提示配置
+                              { text: "谨守拜功!恪守职责!", centered: false, position: 'below' },
+ { text: "感赞主恩!求主饶恕!", centered: false, position: 'below' },
+  { text: "仅供参考！", centered: true, position: 'below' }
+            ]
+        },
+  txqzds: {
+            name: '同心大寺',
+            coords: [36.964877, 105.914276],
+          timezone: 8, // 中国时区 UTC+8
+            method: 'ISNA', // 北方城市使用ISNA方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                 dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 10, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:30', fixed: '12:50' },  // 当计算结果小于等于'12:30'时显示'12:50'
+                    { threshold: '12:50', fixed: '1:00' },   // 当计算结果大于'12:30' but小于等于'12:50'时显示'1:00'
+                    { threshold: '13:10', fixed: '1:10' }    // 当计算结果大于'12:50' but小于等于'13:10'时显示'1:10'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 63, // 日落后63分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5, // 止斋从晨礼减去5分钟
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 0, // 晡礼时间不偏移
+                lftar_offset: 5, // 【新增】开斋时间：日落时间+5分钟
+                maghrib_offset: 8, // 昏礼从日落加上8分钟
+                main_hemp_time: '12点50分' // 主麻时间
+            },
+            copy_options: {
+              include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_localfajr: true,        // 是否包含本地晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: false,       // 是否包含日中时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: false,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+        },
+  ynsd: {
+            name: '云南沙甸',
+            coords: [23.5281276, 103.231845],
+          timezone: 8, // 中国时区 UTC+8
+            method: 'MWL', // 南方城市使用MWL方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                 fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -55, // 计算-55分钟
+                 dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 10, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:30', fixed: '12:50' },  // 当计算结果小于等于'12:30'时显示'12:50'
+                    { threshold: '12:50', fixed: '1:00' },   // 当计算结果大于'12:30' but小于等于'12:50'时显示'1:00'
+                    { threshold: '13:10', fixed: '1:10' }    // 当计算结果大于'12:50' but小于等于'13:10'时显示'1:10'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 70, // 日落后70分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5, // 止斋从晨礼减去5分钟
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 20, // 晡礼时间不偏移
+                lftar_offset: 4, // 【新增】开斋时间：日落时间+5分钟
+                maghrib_offset: 4, // 昏礼从日落加上8分钟
+                main_hemp_time: '1点30分' // 主麻时间
+            },
+            copy_options: {
+               include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_localfajr: true,        // 是否包含本地晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: false,       // 是否包含日中时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: false,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+        },
+  hnsy: {
+            name: '海南三亚',
+            coords: [18.2563517,109.5130629],
+          timezone: 8, // 中国时区 UTC+8
+            method: 'MWL', // 南方城市使用MWL方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 10, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:30', fixed: '12:50' },  // 当计算结果小于等于'12:30'时显示'12:50'
+                    { threshold: '12:50', fixed: '1:00' },   // 当计算结果大于'12:30' but小于等于'12:50'时显示'1:00'
+                    { threshold: '13:10', fixed: '1:10' }    // 当计算结果大于'12:50' but小于等于'13:10'时显示'1:10'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 85, // 日落后63分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5, // 止斋从晨礼减去5分钟
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 0, // 晡礼时间不偏移
+                lftar_offset: 5, // 【新增】开斋时间：日落时间+5分钟
+                maghrib_offset: 10, // 昏礼从日落加上8分钟
+                main_hemp_time: '1点30分' // 主麻时间
+            },
+            copy_options: {
+               include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_localfajr: true,        // 是否包含本地晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: false,       // 是否包含日中时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: false,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+        },
+        beijing: {
+            name: '北京',
+            coords: [39.9042, 116.4074],
+            timezone: 8, // 中国时区 UTC+8
+            method: 'ISNA', // 北方城市使用ISNA方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                 fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -60, // 计算-50分钟
+                dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 10, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:30', fixed: '12:50' },  // 当计算结果小于等于'12:30'时显示'12:50'
+                    { threshold: '12:50', fixed: '1:00' },   // 当计算结果大于'12:30' but小于等于'12:50'时显示'1:00'
+                    { threshold: '13:10', fixed: '1:10' }    // 当计算结果大于'12:50' but小于等于'13:10'时显示'1:10'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 70, // 日落后70分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5,
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 0, // 晡礼时间加0分钟
+                maghrib_offset: 10,
+                main_hemp_time: '下午1点00分'
+            },
+            copy_options: {
+                include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: true,       // 是否包含晌礼时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: true,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+        },
+        shanghai: {
+            name: '上海',
+            coords: [31.2304, 121.4737],
+            timezone: 8, // 中国时区 UTC+8
+            method: 'ISNA', // 北方城市使用ISNA方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                 fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                 dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 20, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:30', fixed: '12:50' },  // 当计算结果小于等于'12:30'时显示'12:50'
+                    { threshold: '12:50', fixed: '1:00' },   // 当计算结果大于'12:30' but小于等于'12:50'时显示'1:00'
+                    { threshold: '13:10', fixed: '1:10' }    // 当计算结果大于'12:50' but小于等于'13:10'时显示'1:10'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 65, // 日落后65分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5,
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 1, // 晡礼时间加1分钟
+                maghrib_offset: 9,
+                main_hemp_time: '12点50分'
+            },
+            copy_options: {
+                include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: true,       // 是否包含晌礼时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: true,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+        },
+        urumqi: {
+            name: '乌鲁木齐',
+            coords: [43.8256, 87.6168],
+            timezone: 8, // 乌鲁木齐时区 UTC+8
+            method: 'ISNA', // 北方城市使用ISNA方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                 fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                 dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 5, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:30', fixed: '12:50' },  // 当计算结果小于等于'12:30'时显示'12:50'
+                    { threshold: '12:50', fixed: '1:00' },   // 当计算结果大于'12:30' but小于等于'12:50'时显示'1:00'
+                    { threshold: '13:10', fixed: '1:10' }    // 当计算结果大于'12:50' but小于等于'13:10'时显示'1:10'
+                ],
+                isha_type: 'offset', // 宵礼基于日落时间
+                isha_value: 0, // 日落后0分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5,
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 0, // 晡礼时间减0分钟
+                maghrib_offset: 0,
+                main_hemp_time: '1点50分'
+            },
+            copy_options: {
+                include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: true,       // 是否包含晌礼时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: true,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+        },
+        guangzhou: {
+            name: '广州',
+            coords: [23.1291, 113.2644],
+            timezone: 8, // 中国时区 UTC+8
+            method: 'MWL', // 南方城市使用MWL方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                 fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                 dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 15, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:30', fixed: '12:50' },  // 当计算结果小于等于'12:30'时显示'12:50'
+                    { threshold: '12:50', fixed: '1:00' },   // 当计算结果大于'12:30' but小于等于'12:50'时显示'1:00'
+                    { threshold: '13:10', fixed: '1:10' }    // 当计算结果大于'12:50' but小于等于'13:10'时显示'1:10'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 60, // 日落后60分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5,
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 0, // 晡礼时间不偏移
+                maghrib_offset: 7,
+                main_hemp_time: '12点50分'
+            },
+            copy_options: {
+                include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: true,       // 是否包含晌礼时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: true,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+        },
+        hangzhou: {
+            name: '杭州',
+            coords: [30.2741, 120.1551],
+            timezone: 8, // 中国时区 UTC+8
+            method: 'MWL', // 南方城市使用MWL方法
+            asr_method: 'Hanafi', // 晡礼使用标准方法
+            custom: {
+                fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'sunrise', // 本地晨礼基于日出时间
+                localfajr_value: -50, // 计算-50分钟
+                 dhuhr_type: 'multiThreshold', // 晌礼多阈值条件性显示
+                dhuhr_value: 35, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:30', fixed: '12:50' },  // 当计算结果小于等于'12:30'时显示'12:50'
+                    { threshold: '12:50', fixed: '1:00' },   // 当计算结果大于'12:30' but小于等于'12:50'时显示'1:00'
+                    { threshold: '13:10', fixed: '1:10' }    // 当计算结果大于'12:50' but小于等于'13:10'时显示'1:10'
+                ],
+                isha_type: 'sunset', // 宵礼基于日落时间
+                isha_value: 62, // 日落后62分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5,
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 1, // 晡礼时间加1分钟
+                maghrib_offset: 8,
+                main_hemp_time: '12点50分'
+            },
+            copy_options: {
+                include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: true,       // 是否包含晌礼时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: true,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+        },
+        makkah: {
+            name: '麦加',
+            coords: [21.4225, 39.8262], // 麦加坐标
+            timezone: 3, // 麦加时区 UTC+3
+            method: 'Makkah', // 麦加使用麦加方法
+            asr_method: 'Standard', // 晡礼使用标准方法
+            custom: {
+                 fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'offset', // 本地晨礼基于晨礼时间加N分钟
+                localfajr_value: 15, // 计算15分钟
+                 dhuhr_type: 'offset', // 晌礼多阈值条件性显示
+                dhuhr_value: 10, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:30', fixed: '12:50' },  // 当计算结果小于等于'12:30'时显示'12:50'
+                    { threshold: '12:50', fixed: '1:00' },   // 当计算结果大于'12:30' but小于等于'12:50'时显示'1:00'
+                    { threshold: '13:10', fixed: '1:10' }    // 当计算结果大于'12:50' but小于等于'13:10'时显示'1:10'
+                ],
+                isha_type: 'offset', // 宵礼基于日落时间
+                isha_value: 10, // 基于宵礼时间加10分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5, // 止斋从晨礼减去5分钟
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 10, // 晡礼时间加0分钟
+                maghrib_offset: 8, // 昏礼从日落加上5分钟
+               main_hemp_time: '12点38分'
+            },
+            copy_options: {
+                include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: true,       // 是否包含晌礼时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: true,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            }
+                   },
+mak8kah: {
+            name: '麦8加',
+            coords: [21.4225, 39.8262], // 麦加坐标
+            timezone: 8, // 麦加时区 UTC+8
+            method: 'Mak8kah', // 麦加使用麦加方法
+            asr_method: 'Standard', // 晡礼使用标准方法
+            custom: {
+                 fajr_offset: 0, // 晨礼基于PrayTimes结果
+               localfajr_type: 'offset', // 本地晨礼基于晨礼时间加N分钟
+                localfajr_value: 13, // 计算15分钟
+                 dhuhr_type: 'offset', // 晌礼多阈值条件性显示
+                dhuhr_value: 10, // 计算偏移分钟数
+                dhuhr_multi_thresholds: [
+                    { threshold: '12:30', fixed: '12:50' },  // 当计算结果小于等于'12:30'时显示'12:50'
+                    { threshold: '12:50', fixed: '1:00' },   // 当计算结果大于'12:30' but小于等于'12:50'时显示'1:00'
+                    { threshold: '13:10', fixed: '1:10' }    // 当计算结果大于'12:50' but小于等于'13:10'时显示'1:10'
+                ],
+                isha_type: 'offset', // 宵礼基于日落时间
+                isha_value: 29, // 基于宵礼时间加10分钟
+                imsak_type: 'fajr', // 止斋基于晨礼时间
+                imsak_offset: -5, // 止斋从晨礼减去5分钟
+                sunrise_imsak_offset: -60, // 基于日出的止斋时间从日出减去60分钟
+                asr_offset: 10, // 晡礼时间加0分钟
+                maghrib_offset: 8, // 昏礼从日落加上5分钟
+                main_hemp_time: '5点38分' // 主麻时间
+            },
+            copy_options: {
+                include_imsak: true,       // 是否包含止斋时间
+                include_fajr: true,        // 是否包含晨礼时间
+                include_sunrise: true,     // 是否包含日出时间
+                include_dhuhr: true,       // 是否包含晌礼时间
+                include_asr: true,         // 是否包含晡礼时间
+                include_sunset: true,      // 是否包含日落时间
+                include_maghrib: true,     // 是否包含昏礼时间
+                include_isha: true,        // 是否包含宵礼时间
+                include_main_hemp: true,   // 是否包含主麻时间
+                include_lftar: true,       // 是否包含开斋时间
+                include_localdhuhr: true,  // 是否包含撇史尼时间
+                include_localIsha: true    // 是否包含胡夫滩时间
+            },
+                   }
+    };
+
+    // 当城市选择改变时执行的函数
+    function onCityChange() {
+        // 获取城市选择下拉框元素
+        const select = document.getElementById('citySelector');
+        // 更新当前城市变量
+        currentCity = select.value;
+        // 保存选择到本地存储
+        localStorage.setItem('selectedCity', currentCity);
+        // 更新页面标题和副标题
+        updateTitleAndLower();
+        // 重新计算并显示礼拜时间
+        calculatePrayerTimes();
+    }
+
+    // 更新页面标题和副标题的函数
+    function updateTitleAndLower() {
+        // 获取当前城市的配置
+        const config = cityConfig[currentCity] || cityConfig.linhe;
+        // 设置主标题为对应城市的名称
+        document.querySelector('.title').textContent = `${config.name}礼拜时间`;
+        // 设置副标题为对应城市的名称
+        document.getElementById('lowerTitle').textContent = `${config.name}礼拜表`;
+    }
+
+    // 更改日期的函数（参数：天数偏移量，如-1为前一天，0为今天，1为后一天）
+    function changeDate(step) {
+        if (step === 0) {
+            // 如果参数为0，重置为今天
+            currentDate = new Date();
+        } else {
+            // 否则在当前日期基础上加上指定天数
+            currentDate.setDate(currentDate.getDate() + step);
+        }
+        // 更新日期选择框
+        updateDatePicker();
+        // 重新计算并显示礼拜时间
+        calculatePrayerTimes();
+    }
+    
+    // 更新日期选择框
+    function updateDatePicker() {
+        const datePicker = document.getElementById('datePicker');
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+        const day = String(currentDate.getDate()).padStart(2, '0');
+        datePicker.value = `${year}-${month}-${day}`;
+    }
+    
+    // 当日期选择框改变时执行的函数
+    function onDateChange() {
+        const datePicker = document.getElementById('datePicker');
+        const selectedDate = new Date(datePicker.value);
+        if (!isNaN(selectedDate.getTime())) {
+            currentDate = selectedDate;
+            calculatePrayerTimes();
+        }
+    }
+
+    // 计算并显示礼拜时间的主要函数
+    function calculatePrayerTimes() {
+        // 检查是否过期
+        const expiry = new Date('2028-03-22');
+        const now = new Date();
+        now.setHours(0,0,0,0);
+        expiry.setHours(0,0,0,0);
+        if (now > expiry) return;
+
+        try {
+            // 获取当前城市的配置信息
+            const config = cityConfig[currentCity] || cityConfig.linhe;
+            // 获取当前城市的坐标
+            const coords = config.coords;
+            // 获取当前城市的时区
+            const timezone = config.timezone;
+            // 获取当前城市的计算方法
+            const method = config.method || 'MWL';
+            // 获取当前城市的晡礼计算方法
+            const asrMethod = config.asr_method || 'Standard';
+            // 获取当前城市的自定义设置
+            const custom = config.custom;
+            
+            // 创建PrayTimes实例并设置计算方法
+            const PT = new PrayTimes(method);
+            // 设置晡礼计算方法
+            PT.adjust({asr: asrMethod});
+            
+            // 计算基础礼拜时间（基于天文算法） - 保存原始时间用于止斋计算
+            const originalTimes = PT.getTimes(currentDate, coords, timezone); // 使用城市特定时区
+
+            // 中文标签到英文键名的映射（用于表格显示）
+            const cnToEn = {
+                '止斋:': 'imsak',
+                '入邦布达:': 'fajr',
+                '邦布达:': 'localfajr',
+                '日出:': 'sunrise',
+                '日中:': 'dhuhr',
+                '主麻:': 'main hemp',
+                '撇史尼:': 'localdhuhr',
+                '底格勒:': 'asr',
+                '日落:': 'sunset',
+                '开斋:': 'lftar',
+                '沙目:': 'maghrib',
+                '胡夫滩:': 'localIsha'
+
+            };
+
+            // 创建一个新的时间对象用于存储最终结果
+            const times = {};
+            // 复制原始时间到新对象
+            for (let key in originalTimes) {
+                times[key] = originalTimes[key];
+            }
+
+            // 自定义晌礼时间处理fixed为固定时间  conditional为阈值时间offset为计算时间 multiThreshold为多阈值时间
+            if (custom.dhuhr_type === 'fixed') {
+                // 如果设置了固定的晌礼时间，直接使用
+                times['localdhuhr'] = custom.dhuhr_value;
+            } else if (custom.dhuhr_type === 'conditional') {
+                // 条件性显示：当计算结果小于等于阈值时显示固定时间，否则按计算结果显示
+                const [dhuhrHour, dhuhrMinute] = times['dhuhr'].split(':').map(Number);
+                const dhuhrTotalMinutes = dhuhrHour * 60 + dhuhrMinute;
+                // 应用晌礼偏移
+                const adjustedDhuhrMinutes = dhuhrTotalMinutes + custom.dhuhr_value;
+                const adjustedHour = Math.floor(adjustedDhuhrMinutes / 60);
+                const adjustedMinute = adjustedDhuhrMinutes % 60;
+                const adjustedTime = `${adjustedHour.toString().padStart(2, '0')}:${adjustedMinute.toString().padStart(2, '0')}`;
+                
+                // 解析阈值时间
+                const [thresholdHour, thresholdMinute] = custom.dhuhr_condition_threshold.split(':').map(Number);
+                const thresholdTotalMinutes = thresholdHour * 60 + thresholdMinute;
+                
+                // 解析固定时间
+                const [fixedHour, fixedMinute] = custom.dhuhr_condition_fixed.split(':').map(Number);
+                
+                // 比较计算结果与阈值
+                if (adjustedDhuhrMinutes <= thresholdTotalMinutes) {
+                    // 如果计算结果小于等于阈值，显示固定时间
+                     times['localdhuhr'] = `${fixedHour}:${fixedMinute.toString().padStart(2, '0')}`;
+                } else {
+                    // 否则按计算结果显示
+                    times['localdhuhr'] = adjustedTime;
+                }
+            } else if (custom.dhuhr_type === 'multiThreshold') {
+                // 多阈值条件性显示：根据多个阈值确定显示时间
+                const [dhuhrHour, dhuhrMinute] = times['dhuhr'].split(':').map(Number);
+                const dhuhrTotalMinutes = dhuhrHour * 60 + dhuhrMinute;
+                // 应用晌礼偏移
+                const adjustedDhuhrMinutes = dhuhrTotalMinutes + custom.dhuhr_value;
+                
+                // 根据多阈值配置确定最终时间
+                let finalTime = null;
+                
+                // 遍历阈值配置，找到匹配的时间
+                for (let i = 0; i < custom.dhuhr_multi_thresholds.length; i++) {
+                    const threshold = custom.dhuhr_multi_thresholds[i];
+                    const [thrHour, thrMinute] = threshold.threshold.split(':').map(Number);
+                    const thresholdTotalMinutes = thrHour * 60 + thrMinute;
+                    
+                    if (adjustedDhuhrMinutes <= thresholdTotalMinutes) {
+                        finalTime = threshold.fixed;
+                        break;
+                    }
+                }
+                
+                // 如果没有匹配任何阈值，使用计算结果
+                if (finalTime === null) {
+                    const finalHour = Math.floor(adjustedDhuhrMinutes / 60);
+                    const finalMinute = adjustedDhuhrMinutes % 60;
+                    finalTime = `${finalHour.toString().padStart(2, '0')}:${finalMinute.toString().padStart(2, '0')}`;
+                }
+                
+                times['localdhuhr'] = finalTime;
+            } else if (custom.dhuhr_type === 'offset') {
+                // 如果是基于PrayTimes结果的偏移
+                const [dhuhrHour, dhuhrMinute] = times['dhuhr'].split(':').map(Number);
+                const dhuhrTotalMinutes = dhuhrHour * 60 + dhuhrMinute;
+                // 应用晌礼偏移
+                const adjustedPsnMinutes = dhuhrTotalMinutes + custom.dhuhr_value;
+                const finalHour = Math.floor(adjustedPsnMinutes / 60);
+                const finalMinute = adjustedPsnMinutes % 60;
+                times['localdhuhr'] = `${finalHour.toString().padStart(2, '0')}:${finalMinute.toString().padStart(2, '0')}`;
+            } else {
+                // 默认情况：使用PrayTimes结果加默认偏移
+                const [dhuhrHour, dhuhrMinute] = times['dhuhr'].split(':').map(Number);
+                const dhuhrTotalMinutes = dhuhrHour * 60 + dhuhrMinute;
+                let psnHour = 13, psnMinute = 0;
+                if (dhuhrTotalMinutes >= 778) {
+                    psnMinute = 10;
+                } else if (dhuhrTotalMinutes >= 774) {
+                    psnMinute = 5;
+                }
+                // 应用晌礼偏移
+                const totalPsnMinutes = psnHour * 60 + psnMinute;
+                const adjustedPsnMinutes = totalPsnMinutes + custom.dhuhr_value;
+                const finalHour = Math.floor(adjustedPsnMinutes / 60);
+                const finalMinute = adjustedPsnMinutes % 60;
+                times['localdhuhr'] = `${finalHour.toString().padStart(2, '0')}:${finalMinute.toString().padStart(2, '0')}`;
+            }
+
+            // 设置主麻时间
+            times['main hemp'] = custom.main_hemp_time || '12点50分';
+
+            // 晨礼时间：根据自定义类型计算
+            if (custom.fajr_type === 'offset') {
+                // 基于PrayTimes结果加减分钟
+                const [fajrHour, fajrMinute] = times.fajr.split(':');
+                const fajrTotalMinutes = parseInt(fajrHour) * 60 + parseInt(fajrMinute);
+                const adjustedFajrMinutes = fajrTotalMinutes + custom.fajr_value;
+                const finalHour = Math.floor(adjustedFajrMinutes / 60);
+                const finalMinute = adjustedFajrMinutes % 60;
+                times.fajr = `${finalHour.toString().padStart(2, '0')}:${finalMinute.toString().padStart(2, '0')}`;
+            } else if (custom.localfajr_type === 'sunrise') {
+                // 基于日出时间加减分钟
+                const sunriseTime = new Date(currentDate);
+                const [sunriseH, sunriseM] = times.sunrise.split(':');
+                sunriseTime.setHours(parseInt(sunriseH), parseInt(sunriseM), 0, 0);
+                const localfajr = new Date(sunriseTime.getTime() + custom.localfajr_value * 60 * 1000);
+                times.localfajr = `${localfajr.getHours()}:${localfajr.getMinutes().toString().padStart(2, '0')}`;
+            } else if (custom.localfajr_type === 'offset') {
+                // 基于PrayTimes结果的Fajr时间加减分钟
+                const fajrTime = new Date(currentDate);
+                const [fajrH, fajrM] = times.fajr.split(':');
+                fajrTime.setHours(parseInt(fajrH), parseInt(fajrM), 0, 0);
+                const localfajr = new Date(fajrTime.getTime() + custom.localfajr_value * 60 * 1000);
+                times.localfajr = `${localfajr.getHours()}:${localfajr.getMinutes().toString().padStart(2, '0')}`;
+            }
+
+            // 新增：基于原始Fajr时间的自定义偏移
+            // 如果你想要为某个城市使用原始Fajr时间加上自定义分钟数，请在此处添加逻辑
+            // 例如：if (currentCity === 'beijing') times.localfajr = addMinutes(originalTimes.fajr, 10);
+            // 注意：你需要定义一个addMinutes函数，如下所示：
+            function addMinutes(timeStr, mins) {
+                if (!timeStr || typeof timeStr !== 'string') return timeStr;
+                const [h, m] = timeStr.split(':');
+                let total = h * 60 + m + mins;
+                total = ((total % 1440) + 1440) % 1440;
+                const newH = Math.floor(total / 60);
+                const newM = total % 60;
+                return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`;
+            }
+            // 示例：为北京增加5分钟
+            if (currentCity === 'beijing') {
+                times.localfajr = addMinutes(originalTimes.fajr, 5);
+            }
+            // 你可以为其他城市添加类似的逻辑
+            // 例如：为上海增加3分钟
+            if (currentCity === 'shanghai') {
+                times.localfajr = addMinutes(originalTimes.fajr, 3);
+            }
+            // 为广州减少2分钟
+            if (currentCity === 'guangzhou') {
+                times.localfajr = addMinutes(originalTimes.fajr, -2);
+            }
+            // 保留原有的自定义逻辑（如日出减分钟）不变
+            // 如果你不想覆盖上面的偏移，可以将上面的if条件改为else if等，根据需要调整逻辑优先级
+
+            // 止斋时间：根据配置决定是基于晨礼还是日出
+            if (custom.imsak_type === 'sunrise') {
+                // 基于日出时间减去指定分钟数
+                const sunriseTime = new Date(currentDate);
+                const [sunriseH, sunriseM] = times.sunrise.split(':');
+                sunriseTime.setHours(parseInt(sunriseH), parseInt(sunriseM), 0, 0);
+                const imsakTime = new Date(sunriseTime.getTime() + custom.sunrise_imsak_offset * 60 * 1000);
+                times.imsak = `${imsakTime.getHours()}:${imsakTime.getMinutes().toString().padStart(2, '0')}`;
+            } else {
+                // 基于原始PrayTimes结果的Fajr时间减去指定分钟数
+                const originalFajrTime = new Date(currentDate);
+                const [originalFajrH, originalFajrM] = originalTimes.fajr.split(':');
+                originalFajrTime.setHours(parseInt(originalFajrH), parseInt(originalFajrM), 0, 0);
+                const imsakTime = new Date(originalFajrTime.getTime() + custom.imsak_offset * 60 * 1000);
+                times.imsak = `${imsakTime.getHours()}:${imsakTime.getMinutes().toString().padStart(2, '0')}`;
+            }
+
+            // 晡礼时间：【关键修复】完全独立处理，不受晌礼处理影响
+            const asrOriginalTime = new Date(currentDate);
+            const [asrH, asrM] = originalTimes.asr.split(':');  // 使用原始PrayTimes的asr时间
+            asrOriginalTime.setHours(parseInt(asrH), parseInt(asrM), 0, 0);
+            const asrCustom = new Date(asrOriginalTime.getTime() + custom.asr_offset * 60 * 1000);
+            times.asr = `${asrCustom.getHours()}:${asrCustom.getMinutes().toString().padStart(2, '0')}`;
+
+            // 昏礼时间：从日落时间加上自定义偏移
+            const sunsetTime = new Date(currentDate);
+            const [sunsetH, sunsetM] = times.sunset.split(':');
+            sunsetTime.setHours(parseInt(sunsetH), parseInt(sunsetM), 0, 0);
+            const maghrib = new Date(sunsetTime.getTime() + custom.maghrib_offset * 60 * 1000);
+            times.maghrib = `${maghrib.getHours()}:${maghrib.getMinutes().toString().padStart(2, '0')}`;
+
+            // 【关键修改】开斋时间：日落时间+自定义分钟数
+            const sunsetTimeForKaizai = new Date(currentDate);
+            const [sunsetHForKaizai, sunsetMForKaizai] = times.sunset.split(':');
+            sunsetTimeForKaizai.setHours(parseInt(sunsetHForKaizai), parseInt(sunsetMForKaizai), 0, 0);
+            // 从城市配置中获取开斋时间自定义分钟数，如果未设置则默认为5分钟
+            const lftarMinutes = custom.lftar_offset || 5; // 默认5分钟
+            const lftarTime = new Date(sunsetTimeForKaizai.getTime() + lftarMinutes * 60 * 1000);
+            times.lftar = `${lftarTime.getHours()}:${lftarTime.getMinutes().toString().padStart(2, '0')}`;
+
+            // 宵礼时间：根据自定义类型计算
+            if (custom.isha_type === 'offset') {
+                // 基于PrayTimes结果加减分钟
+                const [ishaHour, ishaMinute] = times.isha.split(':');
+                const ishaTotalMinutes = parseInt(ishaHour) * 60 + parseInt(ishaMinute);
+                const adjustedIshaMinutes = ishaTotalMinutes + custom.isha_value;
+                const finalHour = Math.floor(adjustedIshaMinutes / 60);
+                const finalMinute = adjustedIshaMinutes % 60;
+                const ishaTime = new Date(currentDate);
+                ishaTime.setHours(finalHour, finalMinute, 0, 0);
+                times.localIsha = `${ishaTime.getHours()}:${ishaTime.getMinutes().toString().padStart(2, '0')}`;
+            } else if (custom.isha_type === 'sunset') {
+                // 基于日落时间加减分钟
+                const sunsetTime = new Date(currentDate);
+                const [sunsetH, sunsetM] = times.sunset.split(':');
+                sunsetTime.setHours(parseInt(sunsetH), parseInt(sunsetM), 0, 0);
+                const localIsha = new Date(sunsetTime.getTime() + custom.isha_value * 60 * 1000);
+                times.localIsha = `${localIsha.getHours()}:${localIsha.getMinutes().toString().padStart(2, '0')}`;
+            } else {
+                // 默认使用PrayTimes结果
+                times.localIsha = times.isha;
+            }
+
+            // 星期数组（用于显示中文星期）
+            const weekDays = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;星期日', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;星期一', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;星期二', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;星期三', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;星期四', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;星期五', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;星期六'];
+            // 格式化日期显示
+            const formattedDate = `${currentDate.getFullYear()}年${currentDate.getMonth() + 1}月${currentDate.getDate()}日`;
+            
+            // 构建表格HTML
+            let html = '<table id="timetable">';
+            html += `<tr><th colspan="2">${formattedDate}</th></tr>`;
+            html += `<tr><th colspan="2">${weekDays[currentDate.getDay()]}</th></tr>`;
+
+            // 按顺序显示各项礼拜时间
+            const list = ['止斋:','入邦布达:',  '邦布达:', '日出:', '日中:', '撇史尼:', '底格勒:', '日落:', '开斋:', '沙目:', '胡夫滩:', '主麻:'];
+            list.forEach(cn => {
+                const en = cnToEn[cn];
+                let time = times[en];
+                
+                // 验证时间是否有效
+                if (time === undefined || time === null || time === '') {
+                    time = 'N/A';
+                } else if (time.includes('NaN')) {
+                    time = 'N/A';
+                } else {
+                    // 对于所有时间项，转换为"X点Y分"格式
+                    if (cn !== '主麻:' && cn !== '止斋:' && cn !== '开斋:') {
+                        // 晌礼、晡礼等其他时间转换
+                        if (cn === '撇史尼:') { // 晌礼
+                            if (custom.dhuhr_type === 'fixed') {
+                                // 如果是固定时间，直接使用
+                                time = times['localdhuhr'];
+                            } else {
+                                // 如果是计算时间，转换格式
+                                const [h, m] = times['localdhuhr'].split(':');
+                                let hour = parseInt(h, 10);
+                                let displayHour = hour % 12 || 12;
+                                time = `${displayHour}点${m.split('分')[0]}分`;
+                            }
+                        } else if (cn === '底格勒:') { // 晡礼
+                            // 晡礼时间直接转换格式
+                            const [h, m] = times['asr'].split(':');
+                            let hour = parseInt(h, 10);
+                            let displayHour = hour % 12 || 12;
+                            time = `${displayHour}点${m.split('分')[0]}分`;
+                        } else if (cn === '入邦布达:' || cn === '邦布达:' || cn === '沙目:' || cn === '胡夫滩:'|| cn === '日出:'|| cn === '日落:'  || cn === '日中:' ) {
+                            // 晨礼、昏礼、宵礼转换
+                            const [h, m] = time.split(':');
+                            let hour = parseInt(h, 10);
+                            let displayHour = hour % 12 || 12;
+                            time = `${displayHour}点${m.split('分')[0]}分`;
+                        }
+                    } else if (cn === '止斋:') {
+                        // 特殊处理止斋时间：从24小时制转换为12小时制
+                        const [h, m] = time.split(':');
+                        let hour = parseInt(h, 10);
+                        let displayHour = hour % 12 || 12;
+                        time = `${displayHour}点${m.split('分')[0]}分`;
+                    } else if (cn === '开斋:') {
+                        // 特殊处理开斋时间：从24小时制转换为12小时制
+                        const [h, m] = time.split(':');
+                        let hour = parseInt(h, 10);
+                        let displayHour = hour % 12 || 12;
+                        time = `${displayHour}点${m.split('分')[0]}分`;
+                    }
+                }
+                html += `<tr><td>${cn}</td><td>${time}</td></tr>`;
+            });
+            html += '</table>';
+            // 将生成的表格插入到页面中
+            document.getElementById('tableContainer').innerHTML = html;
+
+        } catch (error) {
+            // 如果出现错误，在页面上显示错误信息
+            document.getElementById('tableContainer').innerHTML = `<p style="color: red;">加载失败：${error.message}</p>`;
+        }
+    }
+
+    // 复制内容到剪贴板的函数
+    function copyContent() {
+        // 获取当前城市的配置信息
+        const config = cityConfig[currentCity] || cityConfig.linhe;
+        // 获取当前城市的复制选项
+        const copyOptions = config.copy_options || {};
+        
+        // 获取副标题内容
+        const lowerTitle = document.getElementById('lowerTitle').textContent;
+        // 获取表格元素
+        const table = document.getElementById('timetable');
+        if (!table) {
+            alert('表格尚未加载完成');
+            return;
+        }
+
+        // 中文标签到英文键名的映射（用于复制选项判断）
+        const cnToEn = {
+            '止斋:': 'include_imsak',
+            '邦布达:': 'include_fajr',
+            '日出:': 'include_sunrise',
+            '日中:': 'include_dhuhr',
+            '撇史尼:': 'include_localdhuhr',
+            '底格勒:': 'include_asr',
+            '日落:': 'include_sunset',
+            '开斋:': 'include_lftar',
+            '沙目:': 'include_maghrib',
+            '胡夫滩:': 'include_localIsha',
+            '主麻:': 'include_main_hemp'
+        };
+
+        // 构建要复制的文本内容
+        let textContent = '';
+        
+        // 添加上方提示文字
+        if (config.copy_tips && Array.isArray(config.copy_tips)) {
+            config.copy_tips.forEach(tip => {
+                if (tip.position === 'above') {
+                    if (tip.centered) {
+                        // 模拟居中：计算文本长度并添加左右空格
+                        const maxWidth = 20; // 假设一行最多20个字符
+                        const padding = Math.floor((maxWidth - tip.text.length) / 2);
+                        const leftPadding = ' '.repeat(padding);
+                        const rightPadding = ' '.repeat(maxWidth - tip.text.length - padding);
+                        textContent += `${leftPadding}${tip.text}${rightPadding}\n`;
+                    } else {
+                        textContent += `${tip.text}\n`;
+                    }
+                }
+            });
+        }
+        
+        // 添加标题
+        textContent += `${lowerTitle}\n`;
+        const rows = Array.from(table.querySelectorAll('tr'));
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = Array.from(row.querySelectorAll('td, th'));
+            if (cells.length === 2) { // 只处理包含两列的行（时间行）
+                const labelCell = cells[0].textContent;
+                const timeCell = cells[1].textContent;
+                
+                // 获取对应的复制选项键名
+                const optionKey = cnToEn[labelCell.trim()];
+                
+                // 如果找不到对应的复制选项键名，跳过这一行
+                if (!optionKey) {
+                    continue;
+                }
+                
+                // 如果复制选项存在且为false，则跳过这一行
+                if (copyOptions.hasOwnProperty(optionKey) && !copyOptions[optionKey]) {
+                    continue; // 跳过这一行
+                }
+                
+                // 添加这行到复制内容
+                textContent += `${labelCell}\t${timeCell}\n`;
+            } else {
+                // 对于标题行（日期、星期），总是包含
+                textContent += cells.map(cell => cell.textContent).join('\t') + '\n';
+            }
+        }
+
+        // 添加下方提示文字
+        if (config.copy_tips && Array.isArray(config.copy_tips)) {
+            config.copy_tips.forEach(tip => {
+                if (tip.position === 'below') {
+                    if (tip.centered) {
+                        // 模拟居中：计算文本长度并添加左右空格
+                        const maxWidth = 20; // 假设一行最多20个字符
+                        const padding = Math.floor((maxWidth - tip.text.length) / 2);
+                        const leftPadding = ' '.repeat(padding);
+                        const rightPadding = ' '.repeat(maxWidth - tip.text.length - padding);
+                        textContent += `${leftPadding}${tip.text}${rightPadding}\n`;
+                    } else {
+                        textContent += `${tip.text}\n`;
+                    }
+                }
+            });
+        }
+
+        // 创建临时文本框并复制内容
+        const tempInput = document.createElement('textarea');
+        tempInput.value = textContent;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+
+        // 显示复制成功的提示（现在在按钮上方）
+        const success = document.getElementById('copySuccess');
+        success.style.display = 'block';
+        setTimeout(() => success.style.display = 'none', 2000);
+    }
+
+    // 页面加载完成后检查是否过期并计算初始时间
+    const nowCheck = new Date();
+    nowCheck.setHours(0,0,0,0);
+    const expiryCheck = new Date('2028-03-22');
+    expiryCheck.setHours(0,0,0,0);
+    if (nowCheck <= expiryCheck) {
+        // 初始化日期选择框
+        updateDatePicker();
+        calculatePrayerTimes();
+    }
+</script>
+
+</body>
+</html>
